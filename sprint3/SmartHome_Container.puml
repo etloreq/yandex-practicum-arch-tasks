@@ -1,0 +1,52 @@
+@startuml
+title SmartHome Container Diagram
+
+!include C4_Container.puml
+
+Person(user, "User", "A user of the smart home system")
+
+System_Ext(devices, "Home Devices API", "External API for smart home devices")
+System_Ext(WebApp, "Web application", "Outsource web application")
+
+Container_Boundary(UserInteraction, "UserInteraction") {
+  Container(ApiGateway, "Api Gateway", "Nginx", "Auth, load balancing, routing")
+  Container(SettingsService, "Settings Service", "Java", "Manipulates home temperature")
+  Container(CurrentStateService, "CurrentState Service", "Java", "Fetches current heating state")
+  Container(SettingsDatabase, "SettingsDatabase", "PostgreSQL", "Stores user heating settings")
+  Container(CurrentStateDatabase, "CurrentStateDatabase", "InfluxDB", "Stores user heating current state")
+}
+
+
+Container_Boundary(DevicesManagement, "DevicesManagement") {
+  Container(UserDevicesService, "User Devices Service", "Java", "Manipulates user devices (link/unlink/get)")
+  Container(UserDevicesDatabase, "UserDevicesDatabase", "PostgreSQL", "Stores user devices")
+}
+
+Container_Boundary(DevicesIntegration, "DevicesIntegration") {
+  Container(DevicesApiIntegration, "DevicesApiIntegration", "Java", "Uses external devices API")
+  Container(DevicesStateCollector, "Devices State Collector", "Java", "Collects devices data")
+  Container(DevicesStateApplier, "Devices State Applier", "Java", "Sets user settings to devices")
+}
+
+Container(MessageBroker, "MessageBroker", "Kafka", "Broker for handling messages")
+
+
+Rel(user, WebApp, "Uses the system")
+Rel(WebApp,ApiGateway,"Reads/write scenarios")
+Rel(ApiGateway,SettingsService,"Set, get user temperature /\nTurn on heating /\nTurn off heating")
+Rel(ApiGateway,CurrentStateService,"Get current heating state")
+Rel(ApiGateway,UserDevicesService,"Get/link/unlink devices")
+
+Rel(SettingsService, SettingsDatabase, "Get, set user temperature / Turn off, turn on heating")
+Rel(SettingsService, MessageBroker, "Send SettingsTemperatureChange, SettingsHeatingChange events")
+Rel(MessageBroker, DevicesStateApplier, "Subscribe to SettingsTemperatureChange, SettingsHeatingChange updates")
+Rel(DevicesApiIntegration, devices, "Set and collect data")
+Rel(DevicesStateCollector, MessageBroker, "Send CurrentState event")
+Rel(MessageBroker, CurrentStateService, "Subscribe to CurrentState")
+Rel(CurrentStateService, CurrentStateDatabase, "Write from CurrentState / read")
+Rel(UserDevicesService, UserDevicesDatabase, "Get, link, unlink device")
+Rel(DevicesApiIntegration, UserDevicesService, "Get device data")
+Rel(DevicesStateCollector, DevicesApiIntegration, "Get current state")
+Rel(DevicesStateApplier, DevicesApiIntegration, "Set user settings")
+
+@enduml

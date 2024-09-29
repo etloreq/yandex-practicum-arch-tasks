@@ -1,0 +1,46 @@
+@startuml
+
+entity Device {
+    * id: number 
+    ---
+    * serial_number: text
+    * api_version: text
+    * house_id: number
+}
+
+entity House {
+    * id: number 
+    ---
+    * name: text
+}
+
+entity User {
+    * id number 
+    ---
+    * login: text
+    * password_hash: text
+}
+
+entity DeviceCurrentState {
+    * device_id: number 
+    ---
+    * temperature: int
+    * is_heating_on: bool
+    * updated_at: timestamp
+}
+
+entity DeviceSettings {
+    * device_id: number 
+    ---
+    * temperature: int
+    * is_heating_on: bool
+    * updated_by_user: number
+    * updated_at: timestamp
+}
+
+User }|--o{ House
+House ||--|{ Device
+Device ||--o{ DeviceCurrentState
+Device ||--|| DeviceSettings
+
+@enduml

@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  devices-service:
+      build: .
+      container_name: devices-service
+      ports:
+        - "8080:8080"
+      environment:
+        - DATABASE_PORT=5432
+        - DATABASE_USER=postgres
+        - DATABASE_PASSWORD=password
+        - DATABASE_NAME=devices
+        - DATABASE_HOST=db
+        - SERVER_PORT=8080
+      depends_on:
+        - db
+
+  db:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: devices
+    volumes:
+      - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"

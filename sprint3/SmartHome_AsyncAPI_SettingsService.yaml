@@ -1,0 +1,61 @@
+asyncapi: '3.0.0'
+info:
+  title: SmartHome Settings Async API
+  version: '1.0.0'
+servers:
+  production:
+    host: api.smarthome.com:5672
+    protocol: kafka
+  staging:
+    host: staging-api.smarthome.com:5672
+    protocol: kafka
+components:
+  messages:
+    SettingsHeatingChange:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+            description: ID девайса
+          is_on:
+            type: boolean
+            description: Включено отопление
+    SettingsTemperatureChange:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+            description: ID девайса
+          temperature:
+            type: integer
+            description: Новая температура
+channels:
+  settingsHeatingChange:
+    address: 'settings.heating.change'
+    title: 'Включена/отключена система отопления'
+    messages:
+      SettingsHeatingChange:
+        $ref: '#/components/messages/SettingsHeatingChange'
+  settingsTemperatureChange:
+    address: 'settings.temperature.change'
+    title: 'Изменились настройки температуры'
+    messages:
+      SettingsTemperatureChange:
+        $ref: '#/components/messages/SettingsTemperatureChange'
+operations:
+  sendSettingsHeatingChange:
+    action: send
+    title: 'Включена/отключена система отопления'
+    channel:
+      $ref: '#/channels/settingsHeatingChange'
+    messages:
+      - $ref: '#/channels/settingsHeatingChange/messages/SettingsHeatingChange'
+  sendSettingsTemperatureChange:
+    action: send
+    title: 'Изменились настройки температуры'
+    channel:
+      $ref: '#/channels/settingsTemperatureChange'
+    messages:
+      - $ref: '#/channels/settingsTemperatureChange/messages/SettingsTemperatureChange'

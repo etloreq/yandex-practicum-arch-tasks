@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  title: settings-service-api
+  version: 0.1.0
+components:
+  parameters: 
+    userID:
+      name: x-user-id
+      in: header
+      description: Authorized user's ID from API Gateway 
+      required: true
+  schemas:
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Код ошибки
+        message:
+          type: string
+          description: Сообщение об ошибке
+    TemperatureChange:
+      required:
+        - temperature
+      properties:
+        temperature:
+          type: integer
+          description: Температура
+    TemperatureSettings:
+      required:
+        - device_id
+        - temperature
+      properties:
+        device_id:
+          type: integer
+          description: ID девайса
+        temperature:
+          type: integer
+          description: Температура
+        updated_by:
+          type: integer
+          description: Пользователь, который установил температуру
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время обновления настройки
+    HeatingStatusChange:
+      required:
+        - is_on
+      properties:
+        temperature:
+          type: boolean
+          description: Отопление включено
+    HeatingStatus:
+      required:
+        - device_id
+        - is_on
+      properties:
+        device_id:
+          type: integer
+          description: ID девайса
+        is_on:
+          type: boolean
+          description: Отопление включено
+        updated_by:
+          type: integer
+          description: Пользователь, который установил настройку
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время обновления настройки
+
+security:
+  - userID: [ ]
+      
+paths:
+  /temperature/{device_id}:
+    parameters:
+      - name: device_id
+        in: path
+        required: true
+      - $ref: "#/components/parameters/userID"
+    get:
+      description: Получение текущих настроек температуры
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TemperatureSettings"
+        403:
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      description: Установка текущих настроек температуры
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemperatureChange"
+      responses:
+        204:
+          description: OK
+        403:
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /heating/{device_id}:
+    parameters:
+      - name: device_id
+        in: path
+        required: true
+      - $ref: "#/components/parameters/userID"
+    get:
+      description: Получение статуса включения отопления
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeatingStatus"
+        403:
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      description: Включение/отключение отопления
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HeatingStatusChange"
+      responses:
+        204:
+          description: OK
+        403:
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"

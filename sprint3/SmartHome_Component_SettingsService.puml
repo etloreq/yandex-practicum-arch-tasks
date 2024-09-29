@@ -1,0 +1,33 @@
+@startuml
+title SmartHome SettingsService Component Diagram
+
+!include C4_Component.puml
+
+Container_Boundary(UserInteraction, "UserInteraction") {
+  Container(SettingsService, "SettingsService", "Java", "Manipulates home temperature")
+  Container(SettingsDatabase, "SettingsDatabase", "PostgreSQL", "Stores user heating settings")
+ }
+
+Container(MessageBroker, "MessageBroker", "Kafka", "Broker for handling messages")
+
+Container(SettingsService, "SettingsService", "Java", "Manipulates home temperature") {
+    Component(TemperatureController, "TemperatureController", "Handles get/set user temperature")
+    Component(HeatingController, "HeatingController", "Handles turn on / turn of heating")
+    Component(Producer, "Producer", "Sends SettingsTemperatureChange, SettingsHeatingChange events")
+    Component(HeatingServiceLayer, "HeatingServiceLayer", "Business logic")
+    Component(TemperatureServiceLayer, "TemperatureServiceLayer", "Business logic")
+    Component(Repository, "Repository", "Database access logic")
+}
+
+Rel(HeatingController, HeatingServiceLayer, "Call turnOn, turnOff")
+Rel(TemperatureController, TemperatureServiceLayer, "Call set / get temperature")
+Rel(Repository, SettingsDatabase, "Write / read settings")
+Rel(HeatingServiceLayer, Repository, "Write / read settings")
+Rel(TemperatureServiceLayer, Repository, "Write / read settings")
+Rel(HeatingServiceLayer, Producer, "Send SettingsHeatingChange events")
+Rel(TemperatureServiceLayer, Producer, "Send SettingsTemperatureChange event")
+Rel(Producer, MessageBroker, "Produce msg")
+
+
+@enduml
+

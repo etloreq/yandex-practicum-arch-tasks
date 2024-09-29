@@ -1,0 +1,47 @@
+@startuml
+title SmartHome CurrentStateService Code Diagram
+
+top to bottom direction
+
+!include C4_Component.puml
+
+class CurrentState {
+    +Int deviceID
+    +Bool heatingStatus
+    +Int temperature
+    +Date updatedAt
+}
+
+class UpdateCurrentState {
+    +Int deviceID
+    +Bool heatingStatus
+    +Int temperature
+}
+
+class Consumer {
+    Parser parser
+    Service service
+    +void run()
+    +void close()
+}
+
+class Parser {
+    +UpdateCurrentState parseMessage(msg string)
+}
+
+class Service {
+    Repository repository
+    +void saveCurrentState(state UpdateCurrentState)
+    +CurrentState getCurrentState(deviceID Int)
+}
+
+class Repository {
+    +void save(state UpdateCurrentState)
+    +CurrentState get(deviceID Int)
+}
+
+Consumer "1" -- "1" Parser : includes
+Consumer "1" -- "1" Service : includes
+Service "1" -- "1" Repository : includes
+
+@enduml

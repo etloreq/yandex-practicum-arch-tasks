@@ -1,0 +1,143 @@
+openapi: 3.0.0
+info:
+  title: devices-api
+  version: 0.1.0
+components:
+  schemas:
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Код ошибки
+        message:
+          type: string
+          description: Сообщение об ошибке
+    SetupDevice:
+      required:
+        - device_id
+      properties:
+        device_id:
+          type: integer
+          description: ID девайса
+    HeatingStatusChange:
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: Отопление включено (on/off)
+    HeatingStatus:
+      required:
+        - device_id
+        - status
+      properties:
+        device_id:
+          type: integer
+          description: ID девайса
+        status:
+          type: string
+          description: Отопление включено (on/off)
+        updated_by:
+          type: integer
+          description: Пользователь, который установил настройку
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время обновления настройки
+
+paths:
+  /devices:
+    post:
+      description: Регистрация нового девайса
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetupDevice"
+      responses:
+        201:
+          description: OK
+        400:
+          description: Невалидный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /devices/{device_id}/status:
+    get:
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      description: Получение статуса включения отопления
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeatingStatus"
+        400:
+          description: Невалидный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      description: Включение/отключение отопления
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HeatingStatusChange"
+      responses:
+        204:
+          description: OK
+        400:
+          description: Невалидный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
