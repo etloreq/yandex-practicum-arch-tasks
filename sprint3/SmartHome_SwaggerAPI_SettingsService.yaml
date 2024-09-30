@@ -23,47 +23,47 @@ components:
           description: Сообщение об ошибке
     TemperatureChange:
       required:
-        - temperature
+        - measure
       properties:
-        temperature:
+        measure:
           type: integer
-          description: Температура
-    TemperatureSettings:
+          description: Желаемое значение датчика
+    DeviceSettings:
       required:
         - device_id
-        - temperature
+        - measure
       properties:
         device_id:
           type: integer
           description: ID девайса
-        temperature:
+        measure:
           type: integer
-          description: Температура
+          description: Желаемое значение датчика
         updated_by:
           type: integer
-          description: Пользователь, который установил температуру
+          description: Пользователь, который установил настройки
         updated_at:
           type: string
           format: date-time
           description: Дата и время обновления настройки
-    HeatingStatusChange:
+    DeviceStateChange:
       required:
-        - is_on
+        - enabled
       properties:
-        temperature:
+        measure:
           type: boolean
-          description: Отопление включено
-    HeatingStatus:
+          description: Включение/отключение девайса
+    DeviceState:
       required:
         - device_id
-        - is_on
+        - enabled
       properties:
         device_id:
           type: integer
           description: ID девайса
-        is_on:
+        enabled:
           type: boolean
-          description: Отопление включено
+          description: Девайс включен/отключен
         updated_by:
           type: integer
           description: Пользователь, который установил настройку
@@ -76,21 +76,21 @@ security:
   - userID: [ ]
       
 paths:
-  /temperature/{device_id}:
+  /measure/{device_id}:
     parameters:
       - name: device_id
         in: path
         required: true
       - $ref: "#/components/parameters/userID"
     get:
-      description: Получение текущих настроек температуры
+      description: Получение текущих настроек девайса
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TemperatureSettings"
+                $ref: "#/components/schemas/DeviceSettings"
         403:
           description: Нет доступа
           content:
@@ -110,7 +110,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     post:
-      description: Установка текущих настроек температуры
+      description: Установка текущих настроек девайса
       requestBody: 
         content:
           application/json:
@@ -137,21 +137,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /heating/{device_id}:
+  /devices/{device_id}:
     parameters:
       - name: device_id
         in: path
         required: true
       - $ref: "#/components/parameters/userID"
     get:
-      description: Получение статуса включения отопления
+      description: Получение статуса включения девайса
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HeatingStatus"
+                $ref: "#/components/schemas/DeviceState"
         403:
           description: Нет доступа
           content:
@@ -171,12 +171,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     post:
-      description: Включение/отключение отопления
+      description: Включение/отключение девайса
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/HeatingStatusChange"
+              $ref: "#/components/schemas/DeviceStateChange"
       responses:
         204:
           description: OK

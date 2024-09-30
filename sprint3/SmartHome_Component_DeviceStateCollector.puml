@@ -16,7 +16,7 @@ Container(DevicesStateCollector, "DevicesStateCollector", "Java", "Collects devi
 }
 
 Rel(Producer, MessageBroker, "Produce CurrentState")
-Rel(Worker, DevicesApiIntegration, "Get current state")
+Rel(Worker, DevicesApiIntegration, "Get current state for batch of devices")
 Rel(Worker, Producer, "Send CurrentState msg")
 
 

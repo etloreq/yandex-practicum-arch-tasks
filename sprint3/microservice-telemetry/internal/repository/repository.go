@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"time"
 
 	influxdb "github.com/influxdata/influxdb-client-go/v2"
 
@@ -31,7 +30,7 @@ func (r *repository) SaveTelemetry(ctx context.Context, telemetry entity.Telemet
 
 	p := influxdb.NewPointWithMeasurement("telemetry").
 		AddTag("device_id", strconv.FormatInt(telemetry.DeviceID, 10)).
-		AddField("temperature", telemetry.Temperature).
+		AddField("measure", telemetry.Measure).
 		SetTime(telemetry.Timestamp)
 
 	err := writeAPI.WritePoint(context.Background(), p)
@@ -55,9 +54,7 @@ func (r *repository) GetLatest(ctx context.Context, deviceID int64) (entity.Tele
 	}
 
 	telemetry := entity.Telemetry{
-		DeviceID:    deviceID,
-		Temperature: 0,
-		Timestamp:   time.Time{},
+		DeviceID: deviceID,
 	}
 
 	if result.Err() != nil {
@@ -70,7 +67,7 @@ func (r *repository) GetLatest(ctx context.Context, deviceID int64) (entity.Tele
 			return entity.Telemetry{}, fmt.Errorf("invalid value: %v", result.Record().Value())
 		}
 		telemetry.Timestamp = result.Record().Time()
-		telemetry.Temperature = value
+		telemetry.Measure = value
 		return telemetry, nil
 	}
 

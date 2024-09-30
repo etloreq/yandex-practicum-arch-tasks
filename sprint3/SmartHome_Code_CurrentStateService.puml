@@ -7,15 +7,15 @@ top to bottom direction
 
 class CurrentState {
     +Int deviceID
-    +Bool heatingStatus
-    +Int temperature
+    +Bool enabled
+    +Int measure
     +Date updatedAt
 }
 
 class UpdateCurrentState {
     +Int deviceID
-    +Bool heatingStatus
-    +Int temperature
+    +Bool enabled
+    +Int measure
 }
 
 class Consumer {

@@ -37,9 +37,9 @@ func (s *server) PostTelemetry(ctx context.Context, request PostTelemetryRequest
 	}
 
 	err := s.service.SaveTelemetry(ctx, entity.Telemetry{
-		DeviceID:    int64(request.Body.DeviceId),
-		Temperature: int64(request.Body.Temperature),
-		Timestamp:   time.Unix(int64(request.Body.Timestamp), 0),
+		DeviceID:  int64(request.Body.DeviceId),
+		Measure:   int64(request.Body.Measure),
+		Timestamp: time.Unix(int64(request.Body.Timestamp), 0),
 	})
 	if err != nil {
 		return PostTelemetry500JSONResponse{
@@ -66,9 +66,9 @@ func (s *server) GetTelemetryDeviceIdLatest(ctx context.Context, request GetTele
 		}, nil
 	}
 	return GetTelemetryDeviceIdLatest200JSONResponse{
-		DeviceId:    int(telemetry.DeviceID),
-		Temperature: int(telemetry.Temperature),
-		Timestamp:   int(telemetry.Timestamp.Unix()),
+		DeviceId:  int(telemetry.DeviceID),
+		Measure:   int(telemetry.Measure),
+		Timestamp: int(telemetry.Timestamp.Unix()),
 	}, nil
 }
 

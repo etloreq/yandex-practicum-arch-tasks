@@ -26,8 +26,8 @@ type CurrentState struct {
 	// DeviceId ID девайса
 	DeviceId int `json:"device_id"`
 
-	// Temperature Температура
-	Temperature int `json:"temperature"`
+	// Measure Измерение
+	Measure int `json:"measure"`
 
 	// Timestamp Таймстамп замера
 	Timestamp int `json:"timestamp"`

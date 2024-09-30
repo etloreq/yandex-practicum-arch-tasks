@@ -18,15 +18,15 @@ components:
     CurrentState:
       required:
         - device_id
-        - temperature
+        - measure
         - timestamp
       properties:
         device_id:
           type: integer
           description: ID девайса
-        temperature:
+        measure:
           type: integer
-          description: Температура
+          description: Измерение
         timestamp:
           type: integer
           description: Таймстамп замера

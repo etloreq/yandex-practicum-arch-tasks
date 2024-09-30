@@ -11,52 +11,51 @@ servers:
     protocol: kafka
 components:
   messages:
-    SettingsHeatingChange:
-      title: Новый статус отопления
+    DeviceStateChange:
       payload:
         type: object
         properties:
           device_id:
             type: integer
             description: ID девайса
-          is_on:
+          enabled:
             type: boolean
-            description: Включено отопление
-    SettingsTemperatureChange:
+            description: Включен/отключен девайс
+    DeviceSettingsChange:
       payload:
         type: object
         properties:
           device_id:
             type: integer
             description: ID девайса
-          temperature:
+          measure:
             type: integer
-            description: Новая температура
+            description: Новый желаемый показатель датчика
 channels:
-  settingsHeatingChange:
-    address: 'settings.heating.change'
-    title: 'Включена/отключена система отопления'
+  deviceStateChange:
+    address: 'device.state.change'
+    title: 'Включена/отключен девайс'
     messages:
-      SettingsHeatingChange:
-        $ref: '#/components/messages/SettingsHeatingChange'
-  settingsTemperatureChange:
-    address: 'settings.temperature.change'
-    title: 'Изменились настройки температуры'
+      DeviceStateChange:
+        $ref: '#/components/messages/DeviceStateChange'
+  deviceSettingsChange:
+    address: 'device.settings.change'
+    title: 'Изменились настройки желаемого показателя датчика'
     messages:
-      SettingsTemperatureChange:
-        $ref: '#/components/messages/SettingsTemperatureChange'
+      DeviceSettingsChange:
+        $ref: '#/components/messages/DeviceSettingsChange'
 operations:
-  receiveSettingsHeatingChange:
+  sendDeviceStateChange:
     action: receive
     title: 'Включена/отключена система отопления'
     channel:
-      $ref: '#/channels/settingsHeatingChange'
+      $ref: '#/channels/deviceStateChange'
     messages:
-      - $ref: '#/channels/settingsHeatingChange/messages/SettingsHeatingChange'
-  receiveSettingsTemperatureChange:
+      - $ref: '#/channels/deviceStateChange/messages/DeviceStateChange'
+  sendDeviceSettingsChange:
     action: receive
-    title: 'Изменились настройки температуры'
+    title: 'Изменились настройки желаемого показателя датчика'
     channel:
-      $ref: '#/channels/settingsTemperatureChange'
+      $ref: '#/channels/deviceSettingsChange'
     messages:
-      - $ref: '#/channels/settingsTemperatureChange/messages/SettingsTemperatureChange'
+      - $ref: '#/channels/deviceSettingsChange/messages/DeviceSettingsChange'

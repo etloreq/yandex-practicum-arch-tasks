@@ -7,56 +7,45 @@ top to bottom direction
 
 class Settings {
     +Int deviceID
-    +Int temperature
-    +Bool isHeatingOn
+    +Int measure
+    +Bool enabled
     +Int changedByUserID
     +Date updatedAt
 }
 
-class TemperatureChange {
+class SettingsChange {
     +Int userID
-    +TemperatureSettings settings
+    +DeviceSettings settings
 }
 
-class HeatingChange {
-    +Bool isOn
-    +HeatingSettings settings
-}
-
-class HeatingSettings {
-   +Int deviceID
-   +Bool isOn
-}
-
-class TemperatureSettings {
-    +Int temperature
+class DeviceSettings {
+    +Int measure
     +Int device ID
 }
 
-class TemperatureService {
+class SettingsService {
     Repository repository
-    +void updateTemperature(temperature TemperatureChange)
-    +TemperatureSettings getTemperatureSettings(deviceID Int)
+    +void updateDeviceSettings(settings SettingsChange)
+    +DeviceSettings getDeviceSettings(deviceID Int)
 }
 
-class HeatingService {
+class StateService {
     Repository repository
-    +void updateHeating(change HeatingChange)
-    +HeatingSettings getHeatingSettings(deviceID Int)
+    +void updateState(deviceID Int, enabled Bool)
+    +Bool getState(deviceID Int)
 }
 
 class Repository {
-    +void updateHeating(change HeatingChange)
-    +void updateTemperature(temperature TemperatureChange)
+    +void updateState(deviceID Int, enabled Bool)
+    +void updateDeviceSettings(measure SettingsChange)
     +Settings getSettings(deviceID Int)
-    +HeatingSettings getHeatingSettings(deviceID Int)
-    +TemperatureSettings getTemperatureSettings(deviceID Int)
+    +Bool getState(deviceID Int)
+    +DeviceSettings getDeviceSettings(deviceID Int)
 }
 
-HeatingService "1" -- "1" Repository : includes
-TemperatureService "1" -- "1" Repository : includes
-HeatingChange "1" -- "1" HeatingSettings : includes
-TemperatureChange "1" -- "1" TemperatureSettings : includes
+StateService "1" -- "1" Repository : includes
+SettingsService "1" -- "1" Repository : includes
+SettingsChange "1" -- "1" DeviceSettings : includes
 
 
 @enduml

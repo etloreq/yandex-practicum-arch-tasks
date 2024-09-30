@@ -9,13 +9,20 @@ System_Ext(devices, "Home Devices API", "External API for smart home devices")
 System_Ext(WebApp, "Web application", "Outsource web application")
 
 Container_Boundary(UserInteraction, "UserInteraction") {
-  Container(ApiGateway, "Api Gateway", "Nginx", "Auth, load balancing, routing")
-  Container(SettingsService, "Settings Service", "Java", "Manipulates home temperature")
-  Container(CurrentStateService, "CurrentState Service", "Java", "Fetches current heating state")
-  Container(SettingsDatabase, "SettingsDatabase", "PostgreSQL", "Stores user heating settings")
-  Container(CurrentStateDatabase, "CurrentStateDatabase", "InfluxDB", "Stores user heating current state")
+     Container(ApiGateway, "Api Gateway", "Nginx", "Auth, load balancing, routing")
 }
 
+Container_Boundary(DevicesFinalData, "DevicesFinalData") {
+  Container(SettingsService, "Settings Service", "Java", "Manipulates home settings")
+  Container(CurrentStateService, "CurrentState Service", "Java", "Fetches device current state")
+  Container(SettingsDatabase, "SettingsDatabase", "PostgreSQL", "Stores device settings")
+  Container(CurrentStateDatabase, "CurrentStateDatabase", "InfluxDB", "Stores device current state")
+}
+
+Container_Boundary(UserManagement, "UserManagement") {
+    Container(UserService, "UserService", "login/register for user")
+    Container(UserDatabase, "UserDatabase", "stores user data")
+}
 
 Container_Boundary(DevicesManagement, "DevicesManagement") {
   Container(UserDevicesService, "User Devices Service", "Java", "Manipulates user devices (link/unlink/get)")
@@ -33,13 +40,13 @@ Container(MessageBroker, "MessageBroker", "Kafka", "Broker for handling messages
 
 Rel(user, WebApp, "Uses the system")
 Rel(WebApp,ApiGateway,"Reads/write scenarios")
-Rel(ApiGateway,SettingsService,"Set, get user temperature /\nTurn on heating /\nTurn off heating")
+Rel(ApiGateway,SettingsService,"Set, get user settings /\nTurn on device /\nTurn off device")
 Rel(ApiGateway,CurrentStateService,"Get current heating state")
 Rel(ApiGateway,UserDevicesService,"Get/link/unlink devices")
 
-Rel(SettingsService, SettingsDatabase, "Get, set user temperature / Turn off, turn on heating")
-Rel(SettingsService, MessageBroker, "Send SettingsTemperatureChange, SettingsHeatingChange events")
-Rel(MessageBroker, DevicesStateApplier, "Subscribe to SettingsTemperatureChange, SettingsHeatingChange updates")
+Rel(SettingsService, SettingsDatabase, "Get, set settings / Turn off, turn on device")
+Rel(SettingsService, MessageBroker, "Send SettingsChange, DeviceStateChange events")
+Rel(MessageBroker, DevicesStateApplier, "Subscribe to SettingsChange, DeviceStateChange updates")
 Rel(DevicesApiIntegration, devices, "Set and collect data")
 Rel(DevicesStateCollector, MessageBroker, "Send CurrentState event")
 Rel(MessageBroker, CurrentStateService, "Subscribe to CurrentState")
