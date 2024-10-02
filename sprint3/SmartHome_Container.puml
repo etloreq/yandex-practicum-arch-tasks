@@ -55,5 +55,7 @@ Rel(UserDevicesService, UserDevicesDatabase, "Get, link, unlink device")
 Rel(DevicesApiIntegration, UserDevicesService, "Get device data")
 Rel(DevicesStateCollector, DevicesApiIntegration, "Get current state")
 Rel(DevicesStateApplier, DevicesApiIntegration, "Set user settings")
+Rel(ApiGateway, "UserService", "login/register user, account management")
+Rel(UserService, "UserDatabase", "read/write user data")
 
 @enduml

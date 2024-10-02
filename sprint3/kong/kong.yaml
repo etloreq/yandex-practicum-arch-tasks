@@ -1,0 +1,30 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - host: telemetry-service
+    name: telemetry
+    port: 8081
+    protocol: http
+    routes:
+      - name: telemetry
+        paths:
+          - /telemetry
+        strip_path: false
+  - host: devices-service
+    name: devices
+    port: 8080
+    protocol: http
+    routes:
+      - name: devices
+        paths:
+          - /devices
+        strip_path: false
+plugins:
+  - name: cors
+    config:
+      origins:
+        - "*"
+      credentials: true
+      max_age: 3600
+      preflight_continue: false

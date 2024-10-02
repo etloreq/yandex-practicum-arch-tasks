@@ -2,13 +2,13 @@ package entity
 
 import "time"
 
-type SetHeating struct {
-	DeviceID      int64
-	HeatingStatus bool
+type SetStatus struct {
+	DeviceID int64
+	Enabled  bool
 }
 
-type HeatingSettings struct {
-	DeviceID      int64
-	HeatingStatus bool
-	UpdatedAt     time.Time
+type DeviceSettings struct {
+	DeviceID  int64
+	Enabled   bool
+	UpdatedAt time.Time
 }

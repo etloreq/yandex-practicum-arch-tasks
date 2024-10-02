@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Database
 	Server
+	Kafka
 }
 
 type Server struct {
@@ -21,6 +22,12 @@ type Database struct {
 	User         string `env:"DATABASE_USER"`
 	Password     string `env:"DATABASE_PASSWORD"`
 	DatabaseName string `env:"DATABASE_NAME"`
+}
+
+type Kafka struct {
+	Host               string `env:"KAFKA_HOST" env-default:"localhost"`
+	Port               int64  `env:"KAFKA_PORT" env-default:"9092"`
+	StatusChangedTopic string `env:"KAFKA_TOPIC_STATUS_CHANGED" env-default:"devices.status"`
 }
 
 func Read() (Config, error) {

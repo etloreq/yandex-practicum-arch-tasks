@@ -14,14 +14,14 @@ import (
 type repository interface {
 	BeginTx() (*sqlx.Tx, error)
 	EndTx(tx *sqlx.Tx, err error) error
-	GetHeatingStatus(ctx context.Context, deviceID int64) (entity.HeatingSettings, error)
-	GetHeatingStatusTx(ctx context.Context, tx *sqlx.Tx, deviceID int64) (entity.HeatingSettings, error)
-	SetHeatingStatus(ctx context.Context, tx *sqlx.Tx, in entity.SetHeating) error
+	GetStatus(ctx context.Context, deviceID int64) (entity.DeviceSettings, error)
+	GetStatusTx(ctx context.Context, tx *sqlx.Tx, deviceID int64) (entity.DeviceSettings, error)
+	SetStatus(ctx context.Context, tx *sqlx.Tx, in entity.SetStatus) error
 	CreateDefaultSettings(ctx context.Context, tx *sqlx.Tx, deviceID int64) error
 }
 
 type producer interface {
-	SendHeatingSettingsChangedMessage(ctx context.Context, settings entity.SetHeating) error
+	SendStatusChangedMessage(ctx context.Context, settings entity.SetStatus) error
 }
 
 type service struct {
@@ -33,23 +33,23 @@ func NewService(repo repository, producer producer) *service {
 	return &service{repo: repo, producer: producer}
 }
 
-func (s *service) GetHeatingStatus(ctx context.Context, deviceID int64) (entity.HeatingSettings, error) {
-	return s.repo.GetHeatingStatus(ctx, deviceID)
+func (s *service) GetStatus(ctx context.Context, deviceID int64) (entity.DeviceSettings, error) {
+	return s.repo.GetStatus(ctx, deviceID)
 }
 
-func (s *service) SetHeatingStatus(ctx context.Context, in entity.SetHeating) error {
+func (s *service) SetStatus(ctx context.Context, in entity.SetStatus) error {
 	tx, err := s.repo.BeginTx()
 	if err != nil {
 		return fmt.Errorf("start tx: %w", err)
 	}
 
-	_, err = s.repo.GetHeatingStatusTx(ctx, tx, in.DeviceID)
+	_, err = s.repo.GetStatusTx(ctx, tx, in.DeviceID)
 	if err != nil {
 		_ = s.repo.EndTx(tx, err)
 		return err
 	}
 
-	err = s.repo.SetHeatingStatus(ctx, tx, in)
+	err = s.repo.SetStatus(ctx, tx, in)
 	if err != nil {
 		_ = s.repo.EndTx(tx, err)
 		return fmt.Errorf("save to db: %w", err)
@@ -59,7 +59,7 @@ func (s *service) SetHeatingStatus(ctx context.Context, in entity.SetHeating) er
 		return fmt.Errorf("commit tx: %w", err)
 	}
 
-	err = s.producer.SendHeatingSettingsChangedMessage(ctx, in)
+	err = s.producer.SendStatusChangedMessage(ctx, in)
 	if err != nil {
 		return fmt.Errorf("send msg: %w", err)
 	}
@@ -72,7 +72,7 @@ func (s *service) RegisterDevice(ctx context.Context, deviceID int64) error {
 		return fmt.Errorf("start tx: %w", err)
 	}
 
-	_, err = s.repo.GetHeatingStatusTx(ctx, tx, deviceID)
+	_, err = s.repo.GetStatusTx(ctx, tx, deviceID)
 	if err != errs.ErrNotFound {
 		_ = s.repo.EndTx(tx, err)
 		return errors.New("already exists")

@@ -25,7 +25,10 @@ func main() {
 	defer db.Close()
 
 	repo := repository.New(db)
-	srv := service.NewService(repo, producer.New())
+	kafkaProducer, closer := producer.New(config.Kafka)
+	defer closer()
+
+	srv := service.NewService(repo, kafkaProducer)
 
 	// create a type that satisfies the `api.ServerInterface`, which contains an implementation of every operation from the generated code
 	server := api.NewServer(srv)

@@ -21,8 +21,8 @@ const (
 
 type service interface {
 	RegisterDevice(ctx context.Context, deviceID int64) error
-	SetHeatingStatus(ctx context.Context, in entity.SetHeating) error
-	GetHeatingStatus(ctx context.Context, deviceID int64) (entity.HeatingSettings, error)
+	SetStatus(ctx context.Context, in entity.SetStatus) error
+	GetStatus(ctx context.Context, deviceID int64) (entity.DeviceSettings, error)
 }
 
 type server struct {
@@ -41,7 +41,7 @@ func (s *server) GetDevicesDeviceIdStatus(ctx context.Context, request GetDevice
 		}, nil
 	}
 
-	settings, err := s.service.GetHeatingStatus(ctx, int64(request.DeviceId))
+	settings, err := s.service.GetStatus(ctx, int64(request.DeviceId))
 	if err != nil {
 		if errors.Is(err, errs.ErrNotFound) {
 			return GetDevicesDeviceIdStatus404JSONResponse{
@@ -80,7 +80,7 @@ func (s *server) PutDevicesDeviceIdStatus(ctx context.Context, request PutDevice
 		}, nil
 	}
 
-	err := s.service.SetHeatingStatus(ctx, convertInSettingsToEntity(request.DeviceId, *request.Body))
+	err := s.service.SetStatus(ctx, convertInSettingsToEntity(request.DeviceId, *request.Body))
 	if err != nil {
 		if errors.Is(err, errs.ErrNotFound) {
 			return PutDevicesDeviceIdStatus404JSONResponse{
@@ -121,9 +121,9 @@ func (s *server) PostDevices(ctx context.Context, request PostDevicesRequestObje
 	return PostDevices201Response{}, nil
 }
 
-func convertSettingsToOutDto(settings entity.HeatingSettings) GetDevicesDeviceIdStatus200JSONResponse {
+func convertSettingsToOutDto(settings entity.DeviceSettings) GetDevicesDeviceIdStatus200JSONResponse {
 	status := dtoStatusOn
-	if !settings.HeatingStatus {
+	if !settings.Enabled {
 		status = dtoStatusOff
 	}
 	return GetDevicesDeviceIdStatus200JSONResponse{
@@ -133,12 +133,12 @@ func convertSettingsToOutDto(settings entity.HeatingSettings) GetDevicesDeviceId
 	}
 }
 
-func convertInSettingsToEntity(deviceID int, in PutDevicesDeviceIdStatusJSONRequestBody) entity.SetHeating {
-	e := entity.SetHeating{
+func convertInSettingsToEntity(deviceID int, in PutDevicesDeviceIdStatusJSONRequestBody) entity.SetStatus {
+	e := entity.SetStatus{
 		DeviceID: int64(deviceID),
 	}
 	if in.Status == dtoStatusOn {
-		e.HeatingStatus = true
+		e.Enabled = true
 	}
 	return e
 }

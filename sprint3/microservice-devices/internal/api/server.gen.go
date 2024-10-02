@@ -31,8 +31,8 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-// HeatingStatus defines model for HeatingStatus.
-type HeatingStatus struct {
+// DeviceStatus defines model for DeviceStatus.
+type DeviceStatus struct {
 	// DeviceId ID девайса
 	DeviceId int `json:"device_id"`
 
@@ -46,8 +46,8 @@ type HeatingStatus struct {
 	UpdatedBy *int `json:"updated_by,omitempty"`
 }
 
-// HeatingStatusChange defines model for HeatingStatusChange.
-type HeatingStatusChange struct {
+// DeviceStatusChange defines model for DeviceStatusChange.
+type DeviceStatusChange struct {
 	// Status Отопление включено (on/off)
 	Status string `json:"status"`
 }
@@ -62,7 +62,7 @@ type SetupDevice struct {
 type PostDevicesJSONRequestBody = SetupDevice
 
 // PutDevicesDeviceIdStatusJSONRequestBody defines body for PutDevicesDeviceIdStatus for application/json ContentType.
-type PutDevicesDeviceIdStatusJSONRequestBody = HeatingStatusChange
+type PutDevicesDeviceIdStatusJSONRequestBody = DeviceStatusChange
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -337,7 +337,7 @@ type GetDevicesDeviceIdStatusResponseObject interface {
 	VisitGetDevicesDeviceIdStatusResponse(w http.ResponseWriter) error
 }
 
-type GetDevicesDeviceIdStatus200JSONResponse HeatingStatus
+type GetDevicesDeviceIdStatus200JSONResponse DeviceStatus
 
 func (response GetDevicesDeviceIdStatus200JSONResponse) VisitGetDevicesDeviceIdStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")

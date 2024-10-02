@@ -30,31 +30,31 @@ func (r *repository) EndTx(tx *sqlx.Tx, err error) error {
 	return tx.Rollback()
 }
 
-func (r *repository) GetHeatingStatus(ctx context.Context, deviceID int64) (entity.HeatingSettings, error) {
-	query := `select device_id, heating_status, updated_at from device_settings where device_id = $1`
-	var settings entity.HeatingSettings
+func (r *repository) GetStatus(ctx context.Context, deviceID int64) (entity.DeviceSettings, error) {
+	query := `select device_id, enabled, updated_at from device_settings where device_id = $1`
+	var settings entity.DeviceSettings
 	err := r.db.QueryRowxContext(ctx, query, deviceID).
-		Scan(&settings.DeviceID, &settings.HeatingStatus, &settings.UpdatedAt)
+		Scan(&settings.DeviceID, &settings.Enabled, &settings.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
-		return entity.HeatingSettings{}, errs.ErrNotFound
+		return entity.DeviceSettings{}, errs.ErrNotFound
 	}
 	return settings, err
 }
 
-func (r *repository) GetHeatingStatusTx(ctx context.Context, tx *sqlx.Tx, deviceID int64) (entity.HeatingSettings, error) {
-	query := `select device_id, heating_status, updated_at from device_settings where device_id = $1 for update`
-	var settings entity.HeatingSettings
+func (r *repository) GetStatusTx(ctx context.Context, tx *sqlx.Tx, deviceID int64) (entity.DeviceSettings, error) {
+	query := `select device_id, enabled, updated_at from device_settings where device_id = $1 for update`
+	var settings entity.DeviceSettings
 	err := tx.QueryRowxContext(ctx, query, deviceID).
-		Scan(&settings.DeviceID, &settings.HeatingStatus, &settings.UpdatedAt)
+		Scan(&settings.DeviceID, &settings.Enabled, &settings.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
-		return entity.HeatingSettings{}, errs.ErrNotFound
+		return entity.DeviceSettings{}, errs.ErrNotFound
 	}
 	return settings, err
 }
 
-func (r *repository) SetHeatingStatus(ctx context.Context, tx *sqlx.Tx, in entity.SetHeating) error {
-	query := `update device_settings set heating_status = $1, updated_at = now() where device_id = $2`
-	_, err := tx.ExecContext(ctx, query, in.HeatingStatus, in.DeviceID)
+func (r *repository) SetStatus(ctx context.Context, tx *sqlx.Tx, in entity.SetStatus) error {
+	query := `update device_settings set enabled = $1, updated_at = now() where device_id = $2`
+	_, err := tx.ExecContext(ctx, query, in.Enabled, in.DeviceID)
 	return err
 }
 
