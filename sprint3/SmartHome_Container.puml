@@ -1,0 +1,61 @@
+@startuml
+title SmartHome Container Diagram
+
+!include C4_Container.puml
+
+Person(user, "User", "A user of the smart home system")
+
+System_Ext(devices, "Home Devices API", "External API for smart home devices")
+System_Ext(WebApp, "Web application", "Outsource web application")
+
+Container_Boundary(UserInteraction, "UserInteraction") {
+     Container(ApiGateway, "Api Gateway", "Nginx", "Auth, load balancing, routing")
+}
+
+Container_Boundary(DevicesFinalData, "DevicesFinalData") {
+  Container(SettingsService, "Settings Service", "Java", "Manipulates home settings")
+  Container(CurrentStateService, "CurrentState Service", "Java", "Fetches device current state")
+  Container(SettingsDatabase, "SettingsDatabase", "PostgreSQL", "Stores device settings")
+  Container(CurrentStateDatabase, "CurrentStateDatabase", "InfluxDB", "Stores device current state")
+}
+
+Container_Boundary(UserManagement, "UserManagement") {
+    Container(UserService, "UserService", "login/register for user")
+    Container(UserDatabase, "UserDatabase", "stores user data")
+}
+
+Container_Boundary(DevicesManagement, "DevicesManagement") {
+  Container(UserDevicesService, "User Devices Service", "Java", "Manipulates user devices (link/unlink/get)")
+  Container(UserDevicesDatabase, "UserDevicesDatabase", "PostgreSQL", "Stores user devices")
+}
+
+Container_Boundary(DevicesIntegration, "DevicesIntegration") {
+  Container(DevicesApiIntegration, "DevicesApiIntegration", "Java", "Uses external devices API")
+  Container(DevicesStateCollector, "Devices State Collector", "Java", "Collects devices data")
+  Container(DevicesStateApplier, "Devices State Applier", "Java", "Sets user settings to devices")
+}
+
+Container(MessageBroker, "MessageBroker", "Kafka", "Broker for handling messages")
+
+
+Rel(user, WebApp, "Uses the system")
+Rel(WebApp,ApiGateway,"Reads/write scenarios")
+Rel(ApiGateway,SettingsService,"Set, get user settings /\nTurn on device /\nTurn off device")
+Rel(ApiGateway,CurrentStateService,"Get current heating state")
+Rel(ApiGateway,UserDevicesService,"Get/link/unlink devices")
+
+Rel(SettingsService, SettingsDatabase, "Get, set settings / Turn off, turn on device")
+Rel(SettingsService, MessageBroker, "Send SettingsChange, DeviceStateChange events")
+Rel(MessageBroker, DevicesStateApplier, "Subscribe to SettingsChange, DeviceStateChange updates")
+Rel(DevicesApiIntegration, devices, "Set and collect data")
+Rel(DevicesStateCollector, MessageBroker, "Send CurrentState event")
+Rel(MessageBroker, CurrentStateService, "Subscribe to CurrentState")
+Rel(CurrentStateService, CurrentStateDatabase, "Write from CurrentState / read")
+Rel(UserDevicesService, UserDevicesDatabase, "Get, link, unlink device")
+Rel(DevicesApiIntegration, UserDevicesService, "Get device data")
+Rel(DevicesStateCollector, DevicesApiIntegration, "Get current state")
+Rel(DevicesStateApplier, DevicesApiIntegration, "Set user settings")
+Rel(ApiGateway, "UserService", "login/register user, account management")
+Rel(UserService, "UserDatabase", "read/write user data")
+
+@enduml

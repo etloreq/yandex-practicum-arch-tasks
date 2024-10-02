@@ -1,0 +1,61 @@
+asyncapi: '3.0.0'
+info:
+  title: SmartHome Settings Async API
+  version: '1.0.0'
+servers:
+  production:
+    host: api.smarthome.com:5672
+    protocol: kafka
+  staging:
+    host: staging-api.smarthome.com:5672
+    protocol: kafka
+components:
+  messages:
+    DeviceStateChange:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+            description: ID девайса
+          enabled:
+            type: boolean
+            description: Включен/отключен девайс
+    DeviceSettingsChange:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+            description: ID девайса
+          measure:
+            type: integer
+            description: Новый желаемый показатель датчика
+channels:
+  deviceStateChange:
+    address: 'device.state.change'
+    title: 'Включена/отключен девайс'
+    messages:
+      DeviceStateChange:
+        $ref: '#/components/messages/DeviceStateChange'
+  deviceSettingsChange:
+    address: 'device.settings.change'
+    title: 'Изменились настройки желаемого показателя датчика'
+    messages:
+      DeviceSettingsChange:
+        $ref: '#/components/messages/DeviceSettingsChange'
+operations:
+  sendDeviceStateChange:
+    action: send
+    title: 'Включена/отключена система отопления'
+    channel:
+      $ref: '#/channels/deviceStateChange'
+    messages:
+      - $ref: '#/channels/deviceStateChange/messages/DeviceStateChange'
+  sendDeviceSettingsChange:
+    action: send
+    title: 'Изменились настройки желаемого показателя датчика'
+    channel:
+      $ref: '#/channels/deviceSettingsChange'
+    messages:
+      - $ref: '#/channels/deviceSettingsChange/messages/DeviceSettingsChange'

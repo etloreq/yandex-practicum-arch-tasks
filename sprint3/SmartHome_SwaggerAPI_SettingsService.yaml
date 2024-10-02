@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  title: settings-service-api
+  version: 0.1.0
+components:
+  parameters: 
+    userID:
+      name: x-user-id
+      in: header
+      description: Authorized user's ID from API Gateway 
+      required: true
+  schemas:
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Код ошибки
+        message:
+          type: string
+          description: Сообщение об ошибке
+    TemperatureChange:
+      required:
+        - measure
+      properties:
+        measure:
+          type: integer
+          description: Желаемое значение датчика
+    DeviceSettings:
+      required:
+        - device_id
+        - measure
+      properties:
+        device_id:
+          type: integer
+          description: ID девайса
+        measure:
+          type: integer
+          description: Желаемое значение датчика
+        updated_by:
+          type: integer
+          description: Пользователь, который установил настройки
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время обновления настройки
+    DeviceStateChange:
+      required:
+        - enabled
+      properties:
+        measure:
+          type: boolean
+          description: Включение/отключение девайса
+    DeviceState:
+      required:
+        - device_id
+        - enabled
+      properties:
+        device_id:
+          type: integer
+          description: ID девайса
+        enabled:
+          type: boolean
+          description: Девайс включен/отключен
+        updated_by:
+          type: integer
+          description: Пользователь, который установил настройку
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата и время обновления настройки
+
+security:
+  - userID: [ ]
+      
+paths:
+  /measure/{device_id}:
+    parameters:
+      - name: device_id
+        in: path
+        required: true
+      - $ref: "#/components/parameters/userID"
+    get:
+      description: Получение текущих настроек девайса
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceSettings"
+        403:
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      description: Установка текущих настроек девайса
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemperatureChange"
+      responses:
+        204:
+          description: OK
+        403:
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /devices/{device_id}:
+    parameters:
+      - name: device_id
+        in: path
+        required: true
+      - $ref: "#/components/parameters/userID"
+    get:
+      description: Получение статуса включения девайса
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceState"
+        403:
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      description: Включение/отключение девайса
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceStateChange"
+      responses:
+        204:
+          description: OK
+        403:
+          description: Нет доступа
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Не найден девайс
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Ошибка при выполнении запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"

@@ -1,0 +1,24 @@
+@startuml
+title SmartHome DeviceStateCollector Component Diagram
+
+!include C4_Component.puml
+
+Container_Boundary(DevicesIntegration, "DevicesIntegration") {
+  Container(DevicesApiIntegration, "DevicesApiIntegration", "Java", "Uses external devices API")
+  Container(DevicesStateCollector, "Devices State Collector", "Java", "Collects devices data")
+}
+
+Container(MessageBroker, "MessageBroker", "Kafka", "Broker for handling messages")
+
+Container(DevicesStateCollector, "DevicesStateCollector", "Java", "Collects devices data") {
+    Component(Worker, "Worker", "Loads devices state")
+    Component(Producer, "Producer", "Sends CurrentState message")
+}
+
+Rel(Producer, MessageBroker, "Produce CurrentState")
+Rel(Worker, DevicesApiIntegration, "Get current state for batch of devices")
+Rel(Worker, Producer, "Send CurrentState msg")
+
+
+@enduml
+

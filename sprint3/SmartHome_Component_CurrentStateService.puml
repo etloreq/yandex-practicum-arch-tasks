@@ -1,0 +1,28 @@
+@startuml
+title SmartHome CurrentStateService Component Diagram
+
+!include C4_Component.puml
+
+Container_Boundary(UserInteraction, "UserInteraction") {
+  Container(CurrentStateService, "CurrentState Service", "Java", "Manages current devices state")
+  Container(CurrentStateDatabase, "CurrentStateDatabase", "InfluxDB", "Stores current devices state")
+}
+
+Container(MessageBroker, "MessageBroker", "Kafka", "Broker for handling messages")
+
+Container(CurrentStateService, "CurrentState Service", "Java", "Manages current devices state") {
+    Component(StateController, "StateController", "Handles get current state requests")
+    Component(Consumer, "Consumer", "Processes CurrentState message")
+    Component(ServiceLayer, "ServiceLayer", "Business logic")
+    Component(Repository, "Repository", "Database access logic")
+}
+
+
+Rel(MessageBroker, Consumer, "Subscribe to CurrentState")
+Rel(Consumer, ServiceLayer, "Call saveCurrentState")
+Rel(StateController, ServiceLayer, "Call getCurrentState")
+Rel(Repository, CurrentStateDatabase, "Write / read current state")
+Rel(ServiceLayer, Repository, "Write / read current state")
+
+@enduml
+

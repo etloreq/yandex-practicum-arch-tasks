@@ -1,0 +1,51 @@
+@startuml
+title SmartHome SettingsService Code Diagram
+
+top to bottom direction
+
+!include C4_Component.puml
+
+class Settings {
+    +Int deviceID
+    +Int measure
+    +Bool enabled
+    +Int changedByUserID
+    +Date updatedAt
+}
+
+class SettingsChange {
+    +Int userID
+    +DeviceSettings settings
+}
+
+class DeviceSettings {
+    +Int measure
+    +Int device ID
+}
+
+class SettingsService {
+    Repository repository
+    +void updateDeviceSettings(settings SettingsChange)
+    +DeviceSettings getDeviceSettings(deviceID Int)
+}
+
+class StateService {
+    Repository repository
+    +void updateState(deviceID Int, enabled Bool)
+    +Bool getState(deviceID Int)
+}
+
+class Repository {
+    +void updateState(deviceID Int, enabled Bool)
+    +void updateDeviceSettings(measure SettingsChange)
+    +Settings getSettings(deviceID Int)
+    +Bool getState(deviceID Int)
+    +DeviceSettings getDeviceSettings(deviceID Int)
+}
+
+StateService "1" -- "1" Repository : includes
+SettingsService "1" -- "1" Repository : includes
+SettingsChange "1" -- "1" DeviceSettings : includes
+
+
+@enduml

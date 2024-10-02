@@ -1,0 +1,18 @@
+@startuml
+!include C4_Context.puml
+
+title SmartHome Context Diagram
+
+top to bottom direction
+
+Person(user, "User", "A user of the smart home system")
+System(SmartHomeSystem, "SmartHome System", "System managing home temperature")
+
+System_Ext(devices, "Home Devices API", "External API for smart home devices")
+System_Ext(WebApplication, "Web application", "Outsource web application")
+
+Rel(user, WebApplication, "Uses the system")
+Rel(WebApplication, SmartHomeSystem, "Read/write")
+Rel(SmartHomeSystem,devices,"Fetches and manipulates data")
+
+@enduml
